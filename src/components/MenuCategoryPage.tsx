@@ -28,12 +28,12 @@ interface MenuCategoryPageProps {
   icon?: React.ReactNode;
 }
 
-export default function MenuCategoryPage({
+export const MenuCategoryPage: React.FC<MenuCategoryPageProps> = ({
   title,
   items,
   description,
   icon,
-}: MenuCategoryPageProps) {
+}) => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());

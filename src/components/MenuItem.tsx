@@ -7,10 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useCart } from '../contexts/CartContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import toast from 'react-hot-toast';
-import Lock from '../icons/Lock';
-import ChevronDown from '../icons/ChevronDown';
-import Heart from '../icons/Heart';
-import ShoppingCart from '../icons/ShoppingCart';
+import { Lock, ChevronDown, Heart, ShoppingCart } from 'lucide-react';
 
 interface MenuItemProps {
   name: string;

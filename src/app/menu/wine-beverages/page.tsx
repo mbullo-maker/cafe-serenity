@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { wineItems } from "@/data/menu";
+import { wineAndBeveragesItems as wineItems } from "@/data/menu";
 import MenuGrid from "@/components/menu/MenuGrid";
 
 export const metadata: Metadata = {

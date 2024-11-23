@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { pastriesItems } from "@/data/menu";
+import { pastryItems as pastriesItems } from "@/data/menu";
 import MenuGrid from "@/components/menu/MenuGrid";
 
 export const metadata: Metadata = {

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
-import { categories } from '../categories';
+import { categories } from '@/data/categories';
 
 const category = categories.find(cat => cat.id === 'salads')!;
 

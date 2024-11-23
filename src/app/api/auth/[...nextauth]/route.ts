@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { NextAuthOptions } from 'next-auth';
 
 // This would typically come from a database
 const users = [
@@ -12,7 +13,19 @@ const users = [
   },
 ];
 
-const handler = NextAuth({
+interface ExtendedUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
+interface ExtendedSession {
+  user?: ExtendedUser;
+  expires: string;
+}
+
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -51,13 +64,14 @@ const handler = NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }): Promise<ExtendedSession> {
       if (session.user) {
-        session.user.id = token.id as string;
+        (session.user as ExtendedUser).id = token.id as string;
       }
       return session;
     },
   },
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

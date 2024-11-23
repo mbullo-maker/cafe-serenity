@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { categories } from '@/data/categories';
 import { 
   coffeeItems, teaItems, pastryItems, dessertItems, coldBeveragesItems, 
-  soupItems, wineItems, breakfastItems, lunchItems, sandwichItems, 
+  soupItems, wineAndBeveragesItems as wineItems, breakfastItems, lunchItems, sandwichItems, 
   pizzaItems, saladItems
 } from '@/data/menu';
 import { useSession } from 'next-auth/react';
