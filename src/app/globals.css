@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 251, 235;
+  --background-end-rgb: 254, 243, 199;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+}
+
+@layer components {
+  .menu-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+
+  .category-icon {
+    @apply text-amber-700;
+  }
+
+  .category-title {
+    @apply text-3xl font-bold text-brown-900;
+  }
+
+  .category-description {
+    @apply text-lg text-brown-600 max-w-2xl mx-auto;
+  }
+
+  .menu-item {
+    @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow;
+  }
+
+  .menu-item-title {
+    @apply text-xl font-semibold text-brown-900 mb-2;
+  }
+
+  .menu-item-price {
+    @apply text-lg font-medium text-amber-700;
+  }
+
+  .menu-item-description {
+    @apply text-brown-600 mb-4;
+  }
+
+  .menu-item-details {
+    @apply text-sm text-brown-500;
+  }
+}
