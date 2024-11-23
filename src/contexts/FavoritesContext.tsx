@@ -2,9 +2,13 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
+interface MenuItem {
+  id: string;
+}
+
 interface FavoritesContextType {
-  favorites: string[];
-  addToFavorites: (itemId: string) => void;
+  favorites: MenuItem[];
+  addToFavorites: (item: MenuItem) => void;
   removeFromFavorites: (itemId: string) => void;
 }
 
@@ -19,14 +23,19 @@ export function useFavorites() {
 }
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<MenuItem[]>([]);
 
-  const addToFavorites = (itemId: string) => {
-    setFavorites((prev) => [...prev, itemId]);
+  const addToFavorites = (item: MenuItem) => {
+    setFavorites((prev) => {
+      if (prev.some((favItem) => favItem.id === item.id)) {
+        return prev;
+      }
+      return [...prev, item];
+    });
   };
 
   const removeFromFavorites = (itemId: string) => {
-    setFavorites((prev) => prev.filter((id) => id !== itemId));
+    setFavorites((prev) => prev.filter((item) => item.id !== itemId));
   };
 
   return (

@@ -1,9 +1,11 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import RainAnimation from './RainAnimation';
+import AnimatedMenuCategory from './AnimatedMenuCategory';
 import {
   Coffee,
   GlassWater,
@@ -12,6 +14,12 @@ import {
   Salad,
   CupSoda,
 } from 'lucide-react';
+import {
+  staggeredEntranceVariants,
+  staggeredChildVariants,
+  perspectiveLandingVariants,
+  floatingElementVariants
+} from '@/animations';
 
 const categories = [
   {
@@ -21,10 +29,6 @@ const categories = [
     icon: <Coffee className="h-12 w-12" />,
     href: '/menu/espresso-bar',
     itemCount: 10,
-    animation: {
-      hover: { rotate: [0, -10, 10, -10, 0], scale: 1.1 },
-      tap: { scale: 0.95 }
-    }
   },
   {
     id: 'hot-drinks',
@@ -33,10 +37,6 @@ const categories = [
     icon: <CupSoda className="h-12 w-12" />,
     href: '/menu/hot-drinks',
     itemCount: 12,
-    animation: {
-      hover: { y: [-2, 2, -2], scale: 1.1 },
-      tap: { scale: 0.95 }
-    }
   },
   {
     id: 'cold-drinks',
@@ -45,10 +45,6 @@ const categories = [
     icon: <GlassWater className="h-12 w-12" />,
     href: '/menu/cold-drinks',
     itemCount: 12,
-    animation: {
-      hover: { rotate: [0, 5, -5, 5, 0], scale: 1.1 },
-      tap: { scale: 0.95 }
-    }
   },
   {
     id: 'desserts',
@@ -57,10 +53,6 @@ const categories = [
     icon: <Cake className="h-12 w-12" />,
     href: '/menu/desserts',
     itemCount: 12,
-    animation: {
-      hover: { y: [-3, 3, -3], scale: 1.1 },
-      tap: { scale: 0.95 }
-    }
   },
   {
     id: 'sandwiches',
@@ -69,10 +61,6 @@ const categories = [
     icon: <Pizza className="h-12 w-12" />,
     href: '/menu/sandwiches',
     itemCount: 8,
-    animation: {
-      hover: { rotate: [0, 180], scale: 1.1 },
-      tap: { scale: 0.95 }
-    }
   },
   {
     id: 'salads',
@@ -81,36 +69,10 @@ const categories = [
     icon: <Salad className="h-12 w-12" />,
     href: '/menu/salads',
     itemCount: 8,
-    animation: {
-      hover: { rotate: [0, 10, -10, 10, 0], scale: 1.1 },
-      tap: { scale: 0.95 }
-    }
   }
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut"
-    }
-  }
-};
-
-export default function MenuCategories() {
+const MenuCategories = () => {
   const { isAuthenticated } = useAuth();
 
   return (
@@ -132,44 +94,32 @@ export default function MenuCategories() {
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+          variants={staggeredEntranceVariants}
+          initial="initial"
+          animate="animate"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6"
         >
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <motion.div
               key={category.id}
-              variants={itemVariants}
+              variants={staggeredChildVariants}
+              custom={index}
+              whileHover="hover"
+              initial="initial"
+              animate="animate"
+              className="relative"
             >
-              <Link
-                href={category.href}
-                className="block"
-              >
-                <motion.div 
-                  className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-8 h-full"
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
+              <Link href={`/menu/${category.id}`}>
+                <motion.div
+                  variants={perspectiveLandingVariants}
+                  className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer"
                 >
-                  <div className="flex flex-col items-center text-center">
-                    <motion.div 
-                      className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6"
-                      whileHover={category.animation.hover}
-                      whileTap={category.animation.tap}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {category.icon}
-                    </motion.div>
-                    <h2 className="text-2xl font-bold text-brown-900 mb-3">
-                      {category.title}
-                    </h2>
-                    <p className="text-brown-600 mb-4">
-                      {category.description}
-                    </p>
-                    <span className="text-amber-700 font-medium">
-                      {category.itemCount} items
-                    </span>
-                  </div>
+                  <motion.div
+                    variants={floatingElementVariants}
+                    className="aspect-w-16 aspect-h-9"
+                  >
+                    <AnimatedMenuCategory category={category} />
+                  </motion.div>
                 </motion.div>
               </Link>
             </motion.div>
@@ -205,4 +155,6 @@ export default function MenuCategories() {
       </div>
     </div>
   );
-}
+};
+
+export default MenuCategories;

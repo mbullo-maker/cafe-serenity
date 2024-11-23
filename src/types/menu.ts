@@ -21,12 +21,15 @@ export interface DietaryInfo {
 }
 
 export interface Customization {
+  id: string;
   name: string;
+  value: string;
   options: {
+    id: string;
     name: string;
-    price: number;
-    available?: boolean;
+    price?: number;
   }[];
+  price?: number;
 }
 
 export interface MenuItem {
@@ -34,47 +37,44 @@ export interface MenuItem {
   name: string;
   description: string;
   price: number;
-  image: string;
   category: string;
-  isSpecial?: boolean;
-  isSeasonal?: boolean;
-  isBestSeller?: boolean;
-  requiresAuth?: boolean;
-  nutritionInfo?: NutritionInfo;
+  image: string;
   allergens?: string[];
-  customizations?: Customization[];
-  isLocked?: boolean;
-  rating?: number;
+  calories?: number;
+  isVegan?: boolean;
+  isVegetarian?: boolean;
+  isSeasonal?: boolean;
+  isSpicy?: boolean;
   isNew?: boolean;
-  preparationTime?: number;
-  spicyLevel?: 1 | 2 | 3;
-  servingSize?: string;
-  ingredients?: string[];
-  dietaryInfo?: DietaryInfo;
+  isLocked?: boolean;
+  requiresAuth?: boolean;
+  rating?: number;
+  nutritionInfo?: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    fiber?: number;
+  };
   availability?: {
     inStock: boolean;
-    quantity?: number;
     nextAvailable?: string;
-  };
-  discount?: {
-    percentage: number;
-    validUntil: string;
   };
 }
 
 export interface MenuCategory {
   id: string;
-  name: string;
-  icon: LucideIcon;
+  title: string;
   description: string;
+  icon: React.ReactNode;
+  href: string;
+  itemCount: number;
   items?: MenuItem[];
-  isLocked?: boolean;
-  order?: number;
-  featured?: boolean;
-  availableTime?: {
-    start: string;
-    end: string;
-  };
+}
+
+export interface CartItem extends Omit<MenuItem, 'description' | 'category'> {
+  quantity: number;
+  customizations?: Customization[];
 }
 
 export interface MenuCategoryPageProps {

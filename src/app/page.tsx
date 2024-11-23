@@ -5,178 +5,214 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Coffee, Utensils, Clock, Star, ChefHat, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  heroLandingVariants,
+  slideInVariants,
+  cascadeLandingVariants,
+  staggeredEntranceVariants,
+  staggeredChildVariants,
+  floatingElementVariants,
+  revealLandingVariants
+} from '@/animations';
 
 export default function Home() {
   const { isAuthenticated, login } = useAuth();
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const buttonVariants = {
-    hover: {
-      scale: 1.05,
-      transition: {
-        duration: 0.2
-      }
-    },
-    tap: {
-      scale: 0.95
-    }
-  };
-
   return (
     <div className="min-h-screen bg-amber-50">
-      {/* Hero Section */}
-      <motion.section 
-        className="relative h-screen flex items-center justify-center"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
+      {/* Hero Section with Landing Animation */}
+      <motion.section
+        variants={heroLandingVariants}
+        initial="initial"
+        animate="animate"
+        className="relative h-[90vh] flex items-center justify-center text-center px-4"
       >
-        <div className="absolute inset-0 z-0">
-          <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70 z-10" />
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            variants={floatingElementVariants}
+            initial="initial"
+            animate="animate"
+            className="absolute inset-0"
+          >
             <Image
-              src="/images/menu/cafe-hero.jpg"
-              alt="Café Serenity"
+              src="/hero-bg.jpg"
+              alt="Café background"
               fill
               className="object-cover"
               priority
             />
-          </div>
-        </div>
-
-        <div className="relative z-20 text-center text-white px-4 max-w-4xl mx-auto">
-          <motion.h1 
-            className="text-6xl md:text-7xl font-bold mb-6"
-            variants={itemVariants}
-          >
-            Welcome to{" "}
-            <span className="text-amber-400">
-              Café Serenity
-            </span>
-          </motion.h1>
-
-          <motion.p 
-            className="text-xl md:text-2xl mb-8 text-amber-100"
-            variants={itemVariants}
-          >
-            Experience tranquility in every sip
-          </motion.p>
-
-          <motion.div 
-            className="flex gap-4 justify-center"
-            variants={itemVariants}
-          >
-            <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-              <Link
-                href="/menu"
-                className="bg-amber-500 text-white px-8 py-3 rounded-full font-semibold
-                         hover:bg-amber-600 transition-colors inline-flex items-center gap-2"
-              >
-                <Utensils className="w-5 h-5" />
-                View Menu
-              </Link>
-            </motion.div>
-
-            {!isAuthenticated && (
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <button
-                  onClick={() => login()}
-                  className="bg-white text-amber-600 px-8 py-3 rounded-full font-semibold
-                           hover:bg-amber-50 transition-colors inline-flex items-center gap-2"
-                >
-                  <LogIn className="w-5 h-5" />
-                  Sign In
-                </button>
-              </motion.div>
-            )}
           </motion.div>
         </div>
 
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <motion.h1
+            variants={slideInVariants.fromBottom}
+            initial="initial"
+            animate="animate"
+            className="text-6xl font-bold text-white mb-6"
+          >
+            Welcome to Our Café
+          </motion.h1>
+          <motion.p
+            variants={slideInVariants.fromBottom}
+            initial="initial"
+            animate="animate"
+            className="text-xl text-white mb-8"
+          >
+            Experience the perfect blend of taste and ambiance
+          </motion.p>
+          <motion.div
+            variants={staggeredEntranceVariants}
+            initial="initial"
+            animate="animate"
+            className="flex justify-center gap-4"
+          >
+            <Link href="/menu">
+              <motion.button
+                variants={staggeredChildVariants}
+                whileHover="hover"
+                whileTap="tap"
+                className="bg-amber-600 text-white px-8 py-3 rounded-lg font-semibold"
+              >
+                View Menu
+              </motion.button>
+            </Link>
+            {!isAuthenticated && (
+              <motion.button
+                variants={staggeredChildVariants}
+                whileHover="hover"
+                whileTap="tap"
+                onClick={login}
+                className="bg-white text-amber-600 px-8 py-3 rounded-lg font-semibold"
+              >
+                Sign In
+              </motion.button>
+            )}
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Features Section with Cascade Animation */}
+      <motion.section
+        variants={revealLandingVariants}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        className="py-20 px-4 bg-white"
+      >
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{
-            y: [0, 10, 0],
-            transition: { duration: 2, repeat: Infinity }
-          }}
+          variants={staggeredEntranceVariants}
+          className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8"
         >
-          <ChefHat className="w-12 h-12 text-amber-400" />
+          {[
+            {
+              icon: <Coffee className="w-8 h-8" />,
+              title: "Premium Coffee",
+              description: "Sourced from the finest beans around the world"
+            },
+            {
+              icon: <ChefHat className="w-8 h-8" />,
+              title: "Expert Chefs",
+              description: "Culinary masters creating unforgettable experiences"
+            },
+            {
+              icon: <Clock className="w-8 h-8" />,
+              title: "Always Fresh",
+              description: "Made to order with the freshest ingredients"
+            }
+          ].map((feature, index) => (
+            <motion.div
+              key={index}
+              custom={index}
+              variants={cascadeLandingVariants}
+              className="text-center p-6 rounded-xl bg-amber-50"
+            >
+              <motion.div
+                variants={floatingElementVariants}
+                initial="initial"
+                animate="animate"
+                className="inline-block mb-4 text-amber-600"
+              >
+                {feature.icon}
+              </motion.div>
+              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+              <p className="text-gray-600">{feature.description}</p>
+            </motion.div>
+          ))}
         </motion.div>
       </motion.section>
 
-      {/* Features Section */}
+      {/* Special Offers with Slide Animation */}
       <motion.section
-        className="py-20 bg-white"
-        initial="hidden"
-        whileInView="visible"
+        variants={slideInVariants.fromRight}
+        initial="initial"
+        whileInView="animate"
         viewport={{ once: true }}
-        variants={containerVariants}
+        className="py-20 px-4 bg-amber-100"
       >
-        <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
           <motion.h2
-            className="text-4xl font-bold text-center mb-12 text-amber-900"
-            variants={itemVariants}
+            variants={slideInVariants.fromLeft}
+            className="text-4xl font-bold text-center mb-12"
           >
-            Why Choose Us
+            Today's Specials
           </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               {
-                icon: Coffee,
-                title: "Premium Coffee",
-                description: "Sourced from the finest beans around the world"
+                title: "Morning Delight",
+                description: "Freshly baked croissant with premium coffee",
+                price: "$8.99"
               },
               {
-                icon: Star,
-                title: "Excellence",
-                description: "Award-winning service and atmosphere"
-              },
-              {
-                icon: Clock,
-                title: "Always Fresh",
-                description: "Made to order with fresh ingredients"
+                title: "Lunch Special",
+                description: "Gourmet sandwich with soup of the day",
+                price: "$12.99"
               }
-            ].map((feature, i) => (
+            ].map((special, index) => (
               <motion.div
-                key={feature.title}
-                variants={itemVariants}
-                className="bg-amber-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
-                whileHover={{
-                  y: -5,
-                  transition: { duration: 0.2 }
-                }}
+                key={index}
+                variants={cascadeLandingVariants}
+                custom={index}
+                className="bg-white p-6 rounded-xl shadow-lg"
               >
-                <div className="w-12 h-12 bg-amber-500 text-white rounded-full flex items-center justify-center mb-4">
-                  {<feature.icon className="w-6 h-6" />}
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-amber-900">{feature.title}</h3>
-                <p className="text-amber-700">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-2">{special.title}</h3>
+                <p className="text-gray-600 mb-4">{special.description}</p>
+                <p className="text-2xl font-bold text-amber-600">{special.price}</p>
               </motion.div>
             ))}
           </div>
+        </div>
+      </motion.section>
+
+      {/* Call to Action with Bounce Animation */}
+      <motion.section
+        variants={slideInVariants.fromBottom}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        className="py-20 px-4 bg-amber-600 text-white text-center"
+      >
+        <div className="max-w-4xl mx-auto">
+          <motion.h2
+            variants={slideInVariants.fromTop}
+            className="text-4xl font-bold mb-6"
+          >
+            Join Us Today
+          </motion.h2>
+          <motion.p className="text-xl mb-8">
+            Experience the perfect blend of comfort and taste
+          </motion.p>
+          <Link href="/menu">
+            <motion.button
+              variants={staggeredChildVariants}
+              whileHover="hover"
+              whileTap="tap"
+              className="bg-white text-amber-600 px-8 py-3 rounded-lg font-semibold"
+            >
+              Explore Menu
+            </motion.button>
+          </Link>
         </div>
       </motion.section>
     </div>

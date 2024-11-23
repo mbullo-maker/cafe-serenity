@@ -6,20 +6,11 @@ import Link from 'next/link';
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { MenuItem } from '@/types/menu';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import RainAnimation from './RainAnimation';
 import Image from 'next/image';
-
-interface MenuItem {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  image: string;
-  calories: number;
-  allergens: string[];
-}
 
 interface MenuCategoryPageProps {
   title: string;
@@ -38,7 +29,7 @@ export const MenuCategoryPage: React.FC<MenuCategoryPageProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const { isAuthenticated, redirectToLogin } = useAuth();
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
   const router = useRouter();
 
   const handleQuickAdd = (item: MenuItem) => {
@@ -47,7 +38,8 @@ export const MenuCategoryPage: React.FC<MenuCategoryPageProps> = ({
       redirectToLogin(window.location.pathname);
       return;
     }
-    addItem(item, 1);
+    addToCart(item, 1);
+    toast.success(`Added ${item.name} to cart!`);
   };
 
   const handleItemClick = (item: MenuItem) => {
@@ -62,8 +54,10 @@ export const MenuCategoryPage: React.FC<MenuCategoryPageProps> = ({
       redirectToLogin(window.location.pathname);
       return;
     }
-    addItem(selectedItem, quantity);
+    addToCart(selectedItem, quantity);
+    toast.success(`Added ${quantity} ${selectedItem.name}${quantity > 1 ? 's' : ''} to cart!`);
     setSelectedItem(null);
+    setQuantity(1);
   };
 
   const toggleFavorite = (itemId: string) => {

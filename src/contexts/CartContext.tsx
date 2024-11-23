@@ -1,19 +1,19 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/contexts/AuthContext';
-import { MenuItem } from '@/types/menu';
+import { MenuItem, Customization } from '@/types/menu';
 
 export interface CartItem extends Omit<MenuItem, 'description' | 'category' | 'allergens' | 'calories'> {
   quantity: number;
-  customizations?: Record<string, string>;
+  customizations?: Customization[];
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: MenuItem, quantity?: number, customizations?: Record<string, string>) => void;
-  removeItem: (itemId: string) => void;
+  addToCart: (item: MenuItem, quantity?: number, customizations?: Customization[]) => void;
+  removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
   total: number;
@@ -23,8 +23,8 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType>({
   items: [],
-  addItem: () => {},
-  removeItem: () => {},
+  addToCart: () => {},
+  removeFromCart: () => {},
   updateQuantity: () => {},
   clearCart: () => {},
   total: 0,
@@ -53,26 +53,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
 
-  const addItem = (item: MenuItem, quantity: number = 1, customizations?: Record<string, string>) => {
+  const addToCart = (item: MenuItem, quantity: number = 1, customizations?: Customization[]) => {
     if (item.requiresAuth && !isAuthenticated) {
       toast.error('Please log in to add this item to your cart');
       return;
     }
 
-    setItems(currentItems => {
-      const existingItem = currentItems.find(i => i.id === item.id);
-      
+    setItems(prevItems => {
+      const existingItem = prevItems.find(i => i.id === item.id);
       if (existingItem) {
-        // Update existing item
-        return currentItems.map(i => 
-          i.id === item.id
+        return prevItems.map(i => 
+          i.id === item.id 
             ? { ...i, quantity: i.quantity + quantity }
             : i
         );
       }
-
-      // Add new item
-      const newItem: CartItem = {
+      return [...prevItems, {
         id: item.id,
         name: item.name,
         price: item.price,
@@ -81,30 +77,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
         customizations,
         isLocked: item.isLocked,
         requiresAuth: item.requiresAuth,
-      };
-
-      return [...currentItems, newItem];
+      }];
     });
 
     toast.success(`Added ${item.name} to cart`);
   };
 
-  const removeItem = (itemId: string) => {
-    setItems(currentItems => currentItems.filter(item => item.id !== itemId));
+  const removeFromCart = (itemId: string) => {
+    setItems(prevItems => prevItems.filter(item => item.id !== itemId));
     toast.success('Item removed from cart');
   };
 
   const updateQuantity = (itemId: string, quantity: number) => {
     if (quantity < 1) {
-      removeItem(itemId);
+      removeFromCart(itemId);
       return;
     }
-
-    setItems(currentItems =>
-      currentItems.map(item =>
-        item.id === itemId
-          ? { ...item, quantity }
-          : item
+    setItems(prevItems =>
+      prevItems.map(item =>
+        item.id === itemId ? { ...item, quantity } : item
       )
     );
   };
@@ -114,19 +105,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
     toast.success('Cart cleared');
   };
 
+  const total = useMemo(() => 
+    items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items]
+  );
+
+  const itemCount = useMemo(() => 
+    items.reduce((count, item) => count + item.quantity, 0),
+    [items]
+  );
+
   const isItemInCart = (itemId: string) => {
     return items.some(item => item.id === itemId);
   };
-
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
         items,
-        addItem,
-        removeItem,
+        addToCart,
+        removeFromCart,
         updateQuantity,
         clearCart,
         total,

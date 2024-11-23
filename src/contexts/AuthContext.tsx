@@ -12,6 +12,8 @@ interface AuthContextType {
   signup: (data: SignupData) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
+  isLoading: boolean;
+  redirectToLogin: () => void;
 }
 
 interface User {
@@ -34,6 +36,8 @@ const AuthContext = createContext<AuthContextType>({
   signup: async () => {},
   logout: async () => {},
   loading: true,
+  isLoading: true,
+  redirectToLogin: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -112,6 +116,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const redirectToLogin = () => {
+    router.push('/auth/signin');
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -121,6 +129,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signup,
         logout,
         loading,
+        isLoading: loading,
+        redirectToLogin,
       }}
     >
       {children}

@@ -1,185 +1,190 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, ShoppingCart, User, LogIn } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCart } from '@/contexts/CartContext';
-import { signOut } from 'next-auth/react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { ShoppingCart, User, Menu, X } from 'lucide-react';
+import { useSession, signIn, signOut } from 'next-auth/react';
+import {
+  slideInVariants,
+  floatingElementVariants,
+  microInteractionVariants,
+  menuNavLinkVariants,
+  staggeredEntranceVariants,
+  staggeredChildVariants
+} from '@/animations';
 
-export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const pathname = usePathname();
-  const { user, isAuthenticated } = useAuth();
-  const { itemCount } = useCart();
+const Navbar = () => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === 'authenticated';
 
-  const menuItems = [
-    { href: '/', label: 'Home' },
-    { href: '/menu', label: 'Menu' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
-  ];
+  const handleLogin = () => {
+    signIn();
+  };
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' });
+  const handleLogout = () => {
+    signOut();
   };
 
   return (
-    <nav className="bg-amber-900 text-white sticky top-0 z-50 shadow-lg">
+    <motion.nav
+      variants={slideInVariants.fromTop}
+      initial="initial"
+      animate="animate"
+      className="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold">
-              Café Serenity
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <motion.div
+            variants={floatingElementVariants}
+            initial="initial"
+            animate="animate"
+            className="flex-shrink-0"
+          >
+            <Link href="/">
+              <Image
+                src="/logo.png"
+                alt="Café Logo"
+                width={40}
+                height={40}
+                className="w-auto h-8"
+              />
             </Link>
-          </div>
+          </motion.div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-4">
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  pathname === item.href
-                    ? 'bg-amber-700 text-white'
-                    : 'text-amber-100 hover:bg-amber-800'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Auth and Cart Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link
-              href="/cart"
-              className="relative p-2 rounded-full hover:bg-amber-800 transition-colors"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
-
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center space-x-2 p-2 rounded-full hover:bg-amber-800 transition-colors"
-                >
-                  <User className="w-6 h-6" />
-                  <span className="text-sm font-medium">{user?.name || 'User'}</span>
-                </button>
-
-                {isProfileOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          {/* Desktop Navigation */}
+          <motion.div
+            variants={staggeredEntranceVariants}
+            initial="initial"
+            animate="animate"
+            className="hidden md:flex items-center space-x-8"
+          >
+            {[
+              { href: '/', label: 'Home' },
+              { href: '/menu', label: 'Menu' },
+              { href: '/about', label: 'About' },
+              { href: '/contact', label: 'Contact' },
+            ].map((link) => (
+              <motion.div key={link.href} variants={staggeredChildVariants}>
+                <Link href={link.href}>
+                  <motion.span
+                    variants={menuNavLinkVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    className="text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium"
                   >
-                    <div className="py-1">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Sign out
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-            ) : (
-              <Link
-                href="/auth/signin"
-                className="flex items-center space-x-2 px-4 py-2 rounded-md bg-amber-600 hover:bg-amber-700 transition-colors"
-              >
-                <LogIn className="w-5 h-5" />
-                <span>Sign In</span>
+                    {link.label}
+                  </motion.span>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* User Actions */}
+          <motion.div
+            variants={staggeredEntranceVariants}
+            initial="initial"
+            animate="animate"
+            className="hidden md:flex items-center space-x-4"
+          >
+            <motion.div variants={staggeredChildVariants}>
+              <Link href="/cart">
+                <motion.button
+                  variants={microInteractionVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  className="p-2 rounded-full hover:bg-gray-100"
+                >
+                  <ShoppingCart className="w-6 h-6 text-gray-700" />
+                </motion.button>
               </Link>
-            )}
-          </div>
+            </motion.div>
+
+            <motion.div variants={staggeredChildVariants}>
+              {isAuthenticated ? (
+                <motion.button
+                  onClick={handleLogout}
+                  variants={microInteractionVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700"
+                >
+                  Sign Out
+                </motion.button>
+              ) : (
+                <motion.button
+                  onClick={handleLogin}
+                  variants={microInteractionVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700"
+                >
+                  Sign In
+                </motion.button>
+              )}
+            </motion.div>
+          </motion.div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-4">
-            <Link href="/cart" className="relative p-2">
-              <ShoppingCart className="w-6 h-6" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
-
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md hover:bg-amber-800 transition-colors"
+          <motion.div variants={microInteractionVariants} className="md:hidden">
+            <motion.button
+              whileHover="hover"
+              whileTap="tap"
+              onClick={() => setIsOpen(!isOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700"
             >
-              {isMenuOpen ? (
-                <X className="w-6 h-6" />
+              {isOpen ? (
+                <X className="block h-6 w-6" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="block h-6 w-6" />
               )}
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
       </div>
 
       {/* Mobile menu */}
-      {isMenuOpen && (
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{
+          height: isOpen ? 'auto' : 0,
+          opacity: isOpen ? 1 : 0,
+        }}
+        transition={{ duration: 0.3 }}
+        className="md:hidden overflow-hidden"
+      >
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-amber-800"
+          variants={staggeredEntranceVariants}
+          initial="initial"
+          animate={isOpen ? "animate" : "initial"}
+          className="px-2 pt-2 pb-3 space-y-1 sm:px-3"
         >
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  pathname === item.href
-                    ? 'bg-amber-700 text-white'
-                    : 'text-amber-100 hover:bg-amber-700'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.label}
+          {[
+            { href: '/', label: 'Home' },
+            { href: '/menu', label: 'Menu' },
+            { href: '/about', label: 'About' },
+            { href: '/contact', label: 'Contact' },
+          ].map((link) => (
+            <motion.div key={link.href} variants={staggeredChildVariants}>
+              <Link href={link.href}>
+                <motion.span
+                  variants={menuNavLinkVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-amber-600 hover:bg-gray-50"
+                >
+                  {link.label}
+                </motion.span>
               </Link>
-            ))}
-            
-            {!isAuthenticated && (
-              <Link
-                href="/auth/signin"
-                className="block px-3 py-2 rounded-md text-base font-medium text-amber-100 hover:bg-amber-700"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-            )}
-            
-            {isAuthenticated && (
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-amber-100 hover:bg-amber-700"
-              >
-                Sign Out
-              </button>
-            )}
-          </div>
+            </motion.div>
+          ))}
         </motion.div>
-      )}
-    </nav>
+      </motion.div>
+    </motion.nav>
   );
-}
+};
+
+export default Navbar;

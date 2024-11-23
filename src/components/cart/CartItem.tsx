@@ -1,76 +1,85 @@
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
-import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
-import { motion } from 'framer-motion';
-import { CartItem as CartItemType } from '@/contexts/CartContext';
 import { useCart } from '@/contexts/CartContext';
+import { CartItem as CartItemType } from '@/types/menu';
+import { motion } from 'framer-motion';
+import { microInteractionVariants } from '@/animations';
+import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 
 interface CartItemProps {
   item: CartItemType;
 }
 
 export default function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeItem } = useCart();
+  const { updateQuantity, removeFromCart } = useCart();
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newQuantity = parseInt(e.target.value);
+    updateQuantity(item.id, newQuantity);
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm"
+      variants={microInteractionVariants}
+      initial="initial"
+      animate="animate"
+      className="flex items-center justify-between p-4 mb-4 bg-white rounded-lg shadow"
     >
-      <div className="relative w-20 h-20">
+      <div className="flex items-center space-x-4">
         <Image
           src={item.image}
           alt={item.name}
-          fill
-          className="object-cover rounded-md"
+          width={64}
+          height={64}
+          className="rounded-md"
         />
-      </div>
-
-      <div className="flex-1">
-        <h3 className="font-semibold text-gray-800">{item.name}</h3>
-        {item.customizations && Object.entries(item.customizations).length > 0 && (
-          <div className="text-sm text-gray-500 mt-1">
-            {Object.entries(item.customizations).map(([key, value]) => (
-              <span key={key} className="mr-2">
-                {key}: {value}
-              </span>
-            ))}
-          </div>
-        )}
-        <div className="text-primary-600 font-medium mt-1">
-          ${(item.price * item.quantity).toFixed(2)}
+        <div>
+          <h3 className="text-lg font-semibold">{item.name}</h3>
+          <p className="text-gray-600">${item.price.toFixed(2)}</p>
+          {item.customizations?.map((customization, index) => (
+            <p key={index} className="text-sm text-gray-500">
+              {customization.name}: {customization.value}
+            </p>
+          ))}
         </div>
       </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Decrease quantity"
-        >
-          <FiMinus className="w-4 h-4" />
-        </button>
-        
-        <span className="w-8 text-center font-medium">{item.quantity}</span>
-        
-        <button
-          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Increase quantity"
-        >
-          <FiPlus className="w-4 h-4" />
-        </button>
-
-        <button
-          onClick={() => removeItem(item.id)}
-          className="p-1 ml-2 text-red-500 rounded-full hover:bg-red-50 transition-colors"
-          aria-label="Remove item"
-        >
-          <FiTrash2 className="w-4 h-4" />
-        </button>
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+            aria-label="Decrease quantity"
+          >
+            <FiMinus className="w-4 h-4" />
+          </button>
+          <select
+            value={item.quantity}
+            onChange={handleQuantityChange}
+            className="p-2 border rounded"
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+            aria-label="Increase quantity"
+          >
+            <FiPlus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => removeFromCart(item.id)}
+            className="p-1 ml-2 text-red-500 rounded-full hover:bg-red-50 transition-colors"
+            aria-label="Remove item"
+          >
+            <FiTrash2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </motion.div>
   );
